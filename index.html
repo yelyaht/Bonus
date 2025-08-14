@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BNH — Prompt Tournament (No Functions)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* Background gradient */
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1b2e 0%, #0b0d1c 100%);
+      color: #39FF14;
+      margin: 0;
+      padding: 24px;
+    }
+
+    /* Page title styling */
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      text-align: center;
+      color: #BC13FE;
+      text-shadow: 0 0 6px rgba(255, 216, 107, 0.6);
+    }
+
+    /* Subtitle tip */
+    .tip {
+      opacity: 0.85;
+      margin: 0 0 16px;
+      text-align: center;
+      color: #BC13FE;
+    }
+
+    /* Output box styling */
+    #output {
+      background: rgba(17, 19, 42, 0.9);
+      border: 1px solid #2a2c52;
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    }
+
+    #output h2 {
+      margin: 0 0 6px;
+      color: #808080;
+      text-shadow: 0 0 4px rgba(143, 255, 224, 0.6);
+    }
+
+    /* History list */
+    #output ol {
+      margin: 8px 0 0;
+      padding-left: 20px;
+      max-height: 250px; /* scrollable if long */
+      overflow-y: auto;
+    }
+
+    #output li {
+      margin: 6px 0;
+      padding: 6px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+    }
+
+    /* Scrollbar styling (for Chrome/Edge/Safari) */
+    #output ol::-webkit-scrollbar {
+      width: 8px;
+    }
+    #output ol::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+
+  .win { color: #BC13FE; }       /* teal-green for player win */
+  .lose { color: #BC13FE; }      /* red-pink for computer win */
+  .draw { color: #808080; }      /* gray for draw */
+
+  </style>
+</head>
+<body>
+  <h1>Bear · Ninja · Hunter — Prompt Tournament</h1>
+  <p class="tip">Uses only <code>prompt</code>, <code>alert</code>, <code>confirm</code>, loops, and variables — no functions!</p>
+  <div id="output"><em>Play a match to see the summary here…</em></div>
+
+  <script>
+    var playAgain = true;
+
+    while (playAgain === true) {
+      var targetInput = prompt("Play to how many wins? (e.g., 3)", "3");
+      if (targetInput === null) {
+        document.getElementById("output").innerHTML =
+          "<p>Match canceled before starting.</p>" + document.getElementById("output").innerHTML;
+        break;
+      }
+
+      var target = parseInt(targetInput, 10);
+      if (isNaN(target) || target < 1) {
+        alert("Invalid number. Using 1.");
+        target = 1;
+      }
+
+      var moves = ["BEAR", "NINJA", "HUNTER"];
+      var pScore = 0;
+      var cScore = 0;
+      var round = 1;
+      var historyHTML = "";
+
+      while (pScore < target && cScore < target) {
+        var entry = prompt(
+          "Round " + round + " — choose Bear, Ninja, or Hunter (B/N/H). Cancel to stop.",
+          ""
+        );
+
+        if (entry === null) {
+          alert("You canceled. Ending match early.");
+          break;
+        }
+
+        entry = entry.trim().toUpperCase();
+        if (entry === "B") entry = "BEAR";
+        else if (entry === "N") entry = "NINJA";
+        else if (entry === "H") entry = "HUNTER";
+
+        if (entry !== "BEAR" && entry !== "NINJA" && entry !== "HUNTER") {
+          alert("Please enter B, N, or H (or the full word).");
+          continue;
+        }
+
+        var compIndex = Math.floor(Math.random() * 3);
+        var comp = moves[compIndex];
+
+        var resultText = "";
+        if (entry === comp) {
+          resultText = "Draw";
+        } else if (
+          (entry === "BEAR" && comp === "HUNTER") ||
+          (entry === "HUNTER" && comp === "NINJA") ||
+          (entry === "NINJA" && comp === "BEAR")
+        ) {
+          pScore++;
+          resultText = "You win the round";
+        } else {
+          cScore++;
+          resultText = "Computer wins the round";
+        }
+
+        var line = "Round " + round + ": You = " + entry +
+                   " | Computer = " + comp + " → " + resultText +
+                   " (Score " + pScore + "–" + cScore + ")";
+        alert(line);
+
+        historyHTML += "<li>" + line + "</li>";
+        round++;
+      }
+
+      var winnerText = (pScore === cScore)
+        ? "No winner — match ended early."
+        : (pScore > cScore ? "🏆 You win the match!" : "🤖 Computer wins the match!");
+
+      alert("Final: " + pScore + "–" + cScore + ". " + winnerText);
+
+      var summaryHTML =
+        "<h2>Match Summary</h2>" +
+        "<p>Target: " + target + "</p>" +
+        "<p><strong>Final Score:</strong> " + pScore + "–" + cScore + "</p>" +
+        "<p><strong>Result:</strong> " + winnerText + "</p>" +
+        "<ol>" + historyHTML + "</ol><hr/>";
+
+      var out = document.getElementById("output");
+      out.innerHTML = summaryHTML + out.innerHTML;
+
+      playAgain = confirm("Play again?");
+    }
+  </script>
+</body>
+</html>
